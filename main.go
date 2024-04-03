@@ -153,6 +153,7 @@ func convertToEntries(messages []*sqs.Message) []*sqs.SendMessageBatchRequestEnt
 			MessageBody:       message.Body,
 			Id:                message.MessageId,
 			MessageAttributes: message.MessageAttributes,
+			DelaySeconds:      aws.Int64(0),
 		}
 
 		if messageGroupId, ok := message.Attributes[sqs.MessageSystemAttributeNameMessageGroupId]; ok {
@@ -184,7 +185,7 @@ func convertSuccessfulMessageToBatchRequestEntry(messages []*sqs.Message) []*sqs
 func moveMessages(sourceQueueUrl string, destinationQueueUrl string, svc *sqs.SQS, totalMessages int) {
 	var params = &sqs.ReceiveMessageInput{
 		QueueUrl:              aws.String(sourceQueueUrl),
-		VisibilityTimeout:     aws.Int64(2),
+		VisibilityTimeout:     aws.Int64(30),
 		WaitTimeSeconds:       aws.Int64(0),
 		MaxNumberOfMessages:   aws.Int64(*maxBatchSize),
 		MessageAttributeNames: []*string{aws.String(sqs.QueueAttributeNameAll)},
